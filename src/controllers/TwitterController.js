@@ -8,6 +8,9 @@ module.exports = {
 
     async store(req, res) {
         const twitter = await Twitter.create(req.body)
+        
+        req.io.emit('twitter', twitter)
+        
         return res.json(twitter)
     },
 
@@ -16,6 +19,8 @@ module.exports = {
         twitter.set({ likes: ++twitter.likes })
         await twitter.save()
         
+        req.io.emit('twitter.like', twitter)
+
         return res.json(twitter)
     },
 
@@ -23,6 +28,8 @@ module.exports = {
         const twitter = await Twitter.findById(req.params.id)
         twitter.set({ likes: --twitter.likes })
         await twitter.save()
+
+        req.io.emit('twitter.dislike', twitter)
         
         return res.json(twitter)
     }
